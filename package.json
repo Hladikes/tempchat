@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "deploy": "npm run build && node backend/app.js"
+    "deploy": "npm run build && node backend/app.js",
+    "start": "npm run deploy"
   },
   "dependencies": {
     "core-js": "^3.6.5",
