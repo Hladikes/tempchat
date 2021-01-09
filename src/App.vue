@@ -1,28 +1,30 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="h-screen flex justify-center bg-gray-300">
+    <div class="xl:max-w-6xl w-full flex xl:my-20 flex-1 shadow-2xl xl:rounded-xl overflow-hidden bg-white">
+      <auth-box v-if="!isJoined" @onJoin="isJoined = true" />
+      <chat v-else />
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+  import Chat from './components/Chat'
+  import AuthBox from './components/AuthBox'
+  
+  export default {
+    components: {
+      Chat,
+      AuthBox
+    },
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
+    data() {
+      return {
+        isJoined: false
+      }
+    }
   }
-}
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>

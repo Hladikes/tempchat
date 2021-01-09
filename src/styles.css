@@ -1,0 +1,3 @@
+.focusable {
+  @apply focus:ring-2 ring-blue-500 ring-opacity-75
+}

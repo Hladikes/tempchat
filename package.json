@@ -4,15 +4,24 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "deploy": "npm run build && node backend/app.js"
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "express": "^4.17.1",
+    "socket.io": "^3.0.5",
+    "socket.io-client": "^3.0.5",
+    "uuid": "^8.3.2",
     "vue": "^2.6.11"
   },
   "devDependencies": {
+    "@tailwindcss/postcss7-compat": "^2.0.2",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
+    "autoprefixer": "^9.8.6",
+    "postcss": "^7.0.35",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
     "vue-template-compiler": "^2.6.11"
   }
 }
