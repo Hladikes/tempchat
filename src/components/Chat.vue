@@ -1,17 +1,19 @@
 <template>
   <div class="flex-1 flex flex-col">
     <header class="border-b flex  items-center border-white border-opacity-10 z-10 shadow-md">
-      <div class="max-w-xs w-full border-r border-gray-200">
+      <div class="w-64 border-r border-gray-200">
         <h1 class="text-blue-700 font-semibold text-3xl p-6">Temp<span class="font-normal text-blue-400">chat</span></h1>
       </div>
       <h1 class="ml-6 text-gray-500 font-semibold text-2xl">{{ roomName || '-' }}</h1>
     </header>
 
     <main class="flex-1 flex overflow-x-hidden">
-      <aside class="max-w-xs bg-gray-100 space-y-2 py-3 border-r border-gray-300 flex flex-col overflow-y-auto overflow-x-hidden">
-        <p v-for="(user, i) in users" :key="i" class="whitespace-nowrap font-normal select-none py-1 px-3 mx-2 text-xl border-gray-300">{{ user.name }}</p>
+      <aside class="w-64 bg-gray-100 space-y-2 py-3 border-r border-gray-300 flex flex-col overflow-y-auto overflow-x-hidden">
+        <p v-for="(user, i) in users" :key="i" class="whitespace-nowrap font-normal select-none py-1 px-3 mx-2 text-xl border-gray-300 flex justify-between">
+          {{ user.name }}<span v-if="user.isTyping" class="animate-bounce">✍️</span>
+        </p>
         <!-- <p class="font-normal select-none py-1 px-3 mx-2 text-xl border-gray-300">Username</p> -->
-        <!-- <p class="font-normal select-none py-1 px-3 mx-2 text-xl border-gray-300 flex justify-between">Player342<span class="animate-bounce">✍️</span></p> -->
+        <!-- <p class="font-normal select-none py-1 px-3 mx-2 text-xl border-gray-300 flex justify-between">Player342</p> -->
       </aside>
 
       <section class="flex-1 flex flex-col">
@@ -25,7 +27,7 @@
               </p>
 
               <template v-else-if="message.type === 'user_message'">
-                <div v-if="isFromAuthor(message.author.name)" class="py-2 px-4 flex flex-col items-end">
+                <div v-if="isFromAuthor(message.author.uid)" class="py-2 px-4 flex flex-col items-end">
                   <p class="mx-2 font-semibold text-blue-900">{{ message.author.name }}</p>
                   <p class="p-2 px-3 text-xl rounded-xl bg-blue-100 text-blue-900 max-w-md">{{ message.text }}</p>
                 </div>
@@ -39,7 +41,7 @@
           </div>
           <!-- <div class="absolute bottom-0 h-7 w-full bg-gradient-to-t from-white to-transparent z-30"></div> -->
         </div>
-        <div class="p-4 pt-1 flex flex-row">
+        <div class="p-4 pt-1 pb-9 flex flex-row">
           <input 
             autofocus 
             v-model.trim="newMessage" 
@@ -65,13 +67,15 @@
         users: SocketService.users,
         messages: SocketService.messages,
         roomName: SocketService.room,
-        newMessage: ''
+        newMessage: '',
+        typingTimeoutId: -1,
+        isTyping: false
       }
     },
 
     methods: {
-      isFromAuthor(username) {
-        return username === SocketService.username
+      isFromAuthor(uid) {
+        return uid === SocketService.uid
       },
 
       async send() {
@@ -90,6 +94,23 @@
       }
     },
 
+    watch: {
+      newMessage() {
+        if (this.newMessage === '') return
+
+        if (!this.isTyping) {
+          this.isTyping = true
+          SocketService.startTyping()
+        }
+
+        clearTimeout(this.typingTimeoutId)
+        this.typingTimeoutId = setTimeout(() => {
+          this.isTyping = false
+          SocketService.endTyping()
+        }, 800)
+      }
+    },
+
     mounted() {
       SocketService.onUserJoin(user => {
         this.users.unshift(user)
@@ -102,6 +123,16 @@
       SocketService.onUserLeave(user => {
         const userIndex = this.users.findIndex(u => u.uid === user.uid)
         this.users.splice(userIndex, 1)
+      })
+
+      SocketService.onUserStartTyping(user => {
+        const userIndex = this.users.findIndex(u => u.uid === user.uid)
+        this.users[userIndex].isTyping = true
+      })
+
+      SocketService.onUserEndTyping(user => {
+        const userIndex = this.users.findIndex(u => u.uid === user.uid)
+        this.users[userIndex].isTyping = false
       })
     }
   }

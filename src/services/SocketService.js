@@ -12,6 +12,8 @@ class SocketService {
   _onMessageReceived = null
   _onUserJoin = null
   _onUserLeave = null
+  _onUserStartTyping = null
+  _onUserEndTyping = null
 
   connect() {
     return new Promise((resolve, reject) => {
@@ -62,6 +64,28 @@ class SocketService {
     })
   }
 
+  startTyping() {
+    console.log('startTyping()')
+    this.socket.emit('user start typing', {
+      room: this.room,
+      user: {
+        name: this.username,
+        uid: this.uid
+      }
+    })
+  }
+
+  endTyping() {
+    console.log('endTyping()')
+    this.socket.emit('user end typing', {
+      room: this.room,
+      user: {
+        name: this.username,
+        uid: this.uid
+      }
+    })
+  }
+
   _initSocketListeners() {
     this.socket.on('user join', ({ newUser, users }) => {
       if (this._onUserJoin) this._onUserJoin(newUser)
@@ -74,11 +98,21 @@ class SocketService {
     this.socket.on('room message', (message) => {
       if (this._onMessageReceived) this._onMessageReceived(message)
     })
+
+    this.socket.on('user start typing', (user) => {
+      if (this._onUserStartTyping) this._onUserStartTyping(user)
+    })
+
+    this.socket.on('user end typing', (user) => {
+      if (this._onUserEndTyping) this._onUserEndTyping(user)
+    })
   }
 
   onMessageReceived(cb) { this._onMessageReceived = cb }
   onUserJoin(cb) { this._onUserJoin = cb }
   onUserLeave(cb) { this._onUserLeave = cb }
+  onUserStartTyping(cb) { this._onUserStartTyping = cb }
+  onUserEndTyping(cb) { this._onUserEndTyping = cb }
 }
 const socketService = new SocketService()
 

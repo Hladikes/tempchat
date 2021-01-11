@@ -3,8 +3,6 @@
     <div class="border rounded-lg bg-white space-y-2 shadow-md p-4 w-full max-w-sm flex flex-col">
       <h1 class="text-4xl ml-2 mb-4">Join room</h1>
 
-      {{ isError }}
-
       <input
         autofocus
         v-model.trim="username"
@@ -32,7 +30,7 @@
   export default {
     data() {
       return {
-        username: '',
+        username: 'Bot',
         room: 'room1',
         isError: ''
       }

@@ -14,7 +14,7 @@ io.on('connect', socket => {
   socket.on('join', ({ username, room }, callback) => {
     socket.join(room)
     const uuid = uuidv4()
-    const newUser = { uid: uuid, name: username }
+    const newUser = { uid: uuid, name: username, isTyping: false }
     
     if (!rooms.has(room)) {
       rooms.set(room, {
@@ -43,6 +43,18 @@ io.on('connect', socket => {
   socket.on('user message', ({ room, message }, callback) => {
     sendMessage(room, 'user_message', message)
     callback(true)
+  })
+
+  socket.on('user start typing', ({ room, user }, callback) => {
+    console.log('user start typing', room, user)
+    io.to(room).emit('user start typing', user)
+    // callback(true)
+  })
+
+  socket.on('user end typing', ({ room, user }, callback) => {
+    console.log('user end typing', room, user)
+    io.to(room).emit('user end typing', user)
+    // callback(true)
   })
 
   socket.on('disconnect', () => {
